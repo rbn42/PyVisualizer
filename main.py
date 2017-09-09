@@ -18,7 +18,7 @@ def record_qt_multimedia():
     format.setSampleRate(SAMPLE_RATE)
 
     if not info.isFormatSupported(format):
-        print 'Format not supported, using nearest available'
+        print('Format not supported, using nearest available')
         format = nearestFormat(format)
         if format.sampleSize != SAMPLE_SIZE:
             #this is important, since effects assume this sample size.
@@ -52,7 +52,7 @@ try:
     from PySide import QtMultimedia
     read_data = record_qt_multimedia()
 except ImportError:
-    print 'Using PyAudio'
+    print('Using PyAudio')
     import pyaudio
     read_data = record_pyaudio()
 

@@ -106,7 +106,7 @@ class LineVisualizer(Visualizer):
         else:
             #Qt.Key enum helpfully defines most keys as their ASCII code,
             #   so we can use ord('Q') instead of Qt.Key.Key_Q
-            color_bindings = dict(zip((ord(i) for i in 'QWERTYU'), self.brushes))
+            color_bindings = dict(list(zip((ord(i) for i in 'QWERTYU'), self.brushes)))
             try:
                 self.brush = color_bindings[event.key()]
             except KeyError:
@@ -139,8 +139,8 @@ class LineVisualizer(Visualizer):
             painter.setPen(QtCore.Qt.NoPen)
             painter.setBrush(self.brush) 
             
-            for x in xrange(0, self.width() - rect_width, rect_width * 2):
-                for y in xrange(0, self.height(), 2 * rect_height):
+            for x in range(0, self.width() - rect_width, rect_width * 2):
+                for y in range(0, self.height(), 2 * rect_height):
                     if random.randint(0, int(max_amplitude / float(SAMPLE_MAX) * 10)):
                         if self.display_evens:
                             painter.drawRect(x, y, rect_width, rect_height)
@@ -165,7 +165,7 @@ class Spectrogram(Visualizer):
         #bins[-1] = np.mean(fft[indices[-1]:]).astype(int)
         
         step = int(len(fft) / len(bins))
-        for i in xrange(len(bins)):
+        for i in range(len(bins)):
             bins[i] = np.mean(fft[i:i+step])
             
         img = QtGui.QImage(self.width(), self.height(), QtGui.QImage.Format_RGB32)
