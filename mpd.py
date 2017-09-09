@@ -1,6 +1,4 @@
 #!/usr/bin/python
-import setproctitle
-setproctitle.setproctitle("background-visualizer")
 
 import sys
 import numpy as np
@@ -11,7 +9,7 @@ app = QtGui.QApplication(sys.argv)
 
 
 def record_mpd():
-    FIFO='/tmp/mpd.fifo'
+    FIFO = '/tmp/mpd.fifo'
     stereo = True
     fps = 25
     # format                  "44100:16:2"
@@ -31,7 +29,7 @@ read_data = record_mpd()
 
 window = Spectrogram(read_data)
 window.setAttribute(Qt.WA_TranslucentBackground)
-window.setWindowFlags(Qt.FramelessWindowHint) 
+window.setWindowFlags(Qt.FramelessWindowHint)
 window.show()
 
 from Xlib import X, display, Xutil, protocol
@@ -42,5 +40,14 @@ window_xlib.set_wm_class('qmlterm_background', 'qmlterm_background')
 disp.flush()
 disp.close()
 
+import setproctitle
+setproctitle.setproctitle("background-visualizer")
 
+while True:
+    import os.path
+    if os.path.exists('/dev/shm/quit-visualizer'):
+        break
+    app.processEvents()
+import sys
+sys.exit()
 app.exec_()
