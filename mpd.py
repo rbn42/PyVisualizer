@@ -1,7 +1,11 @@
 #!/usr/bin/python
+import setproctitle
+setproctitle.setproctitle("background-visualizer")
+
 import sys
 import numpy as np
 from PySide import QtCore, QtGui
+from PySide.QtCore import *
 from visualizer import *
 app = QtGui.QApplication(sys.argv)
 
@@ -19,13 +23,24 @@ def record_mpd():
     def read_data():
         line = f.read(m_samples)
         data = np.frombuffer(line, 'int16').astype(float)
-        if len(data):
-            return data
+        return data
     return read_data
 
 
 read_data = record_mpd()
 
 window = Spectrogram(read_data)
+window.setAttribute(Qt.WA_TranslucentBackground)
+window.setWindowFlags(Qt.FramelessWindowHint) 
 window.show()
+
+from Xlib import X, display, Xutil, protocol
+disp = display.Display()
+winid = window.winId()
+window_xlib = disp.create_resource_object('window', winid)
+window_xlib.set_wm_class('qmlterm_background', 'qmlterm_background')
+disp.flush()
+disp.close()
+
+
 app.exec_()
