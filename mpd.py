@@ -43,11 +43,10 @@ disp.close()
 import setproctitle
 setproctitle.setproctitle("background-visualizer")
 
+import os.path
 while True:
-    import os.path
     if os.path.exists('/dev/shm/quit-visualizer'):
         break
     app.processEvents()
 import sys
 sys.exit()
-app.exec_()
