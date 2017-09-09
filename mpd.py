@@ -6,7 +6,7 @@ from visualizer import *
 app = QtGui.QApplication(sys.argv)
 
 
-def record_pyaudio():
+def record_mpd():
     FIFO='/tmp/mpd.fifo'
     stereo = True
     fps = 25
@@ -24,7 +24,7 @@ def record_pyaudio():
     return read_data
 
 
-read_data = record_pyaudio()
+read_data = record_mpd()
 
 window = Spectrogram(read_data)
 window.show()
