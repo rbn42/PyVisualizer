@@ -26,6 +26,6 @@ def record_pyaudio():
 
 read_data = record_pyaudio()
 
-window = LineVisualizer(read_data)
+window = Spectrogram(read_data)
 window.show()
 app.exec_()
