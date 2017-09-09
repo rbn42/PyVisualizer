@@ -7,6 +7,7 @@ app = QtGui.QApplication(sys.argv)
 
 
 def record_pyaudio():
+    FIFO='/tmp/mpd.fifo'
     stereo = True
     fps = 25
     # format                  "44100:16:2"
