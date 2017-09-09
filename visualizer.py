@@ -8,12 +8,7 @@ import numpy as np
 from PySide import QtCore, QtGui
 
 SAMPLE_MAX = 32767
-SAMPLE_MIN = -(SAMPLE_MAX + 1)
 SAMPLE_RATE = 44100 # [Hz]
-NYQUIST = SAMPLE_RATE / 2
-SAMPLE_SIZE = 16 # [bit]
-CHANNEL_COUNT = 1
-BUFFER_SIZE = 5000 
 
 
 class Visualizer(QtGui.QLabel):
