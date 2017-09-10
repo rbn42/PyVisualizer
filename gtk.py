@@ -9,7 +9,6 @@ import sys
 FIFO = '/tmp/mpd.fifo'
 stereo = True
 fps = 25
-w, h = 1920, 1080
 m_samples = 44100 // fps
 if stereo:
     m_samples *= 2
@@ -22,7 +21,7 @@ SAMPLE_MAX = SAMPLE_RATE
 class Squareset(Gtk.DrawingArea):
     def __init__(self, upper=9, text=''):
         Gtk.DrawingArea.__init__(self)
-        self.set_size_request(w, h)
+        #self.set_size_request(w, h)
         self.fifo = open(FIFO, 'rb')
 
     def getData(self):
@@ -31,6 +30,8 @@ class Squareset(Gtk.DrawingArea):
         return data
 
     def do_draw_cb(self, widget, cr):
+        allo = self.get_allocation()
+        w, h = allo.width, allo.height
         data = self.getData()
         fft = np.absolute(np.fft.rfft(data, n=len(data)))
         bins = fft
@@ -58,32 +59,36 @@ def tick():
     return True  # Causes timeout to tick again.
 
 
-window = Gtk.Window()
+from singleton import Singleton
+from threading import Thread
+import os
+SOCKET_FILE = "/run/user/%s/gtk_visualizer.socket" % os.getuid()
+sin = Singleton(SOCKET_FILE)
+if sin.start():
+    # Thread(target=sin.loop).start()
+    window = Gtk.Window()
 
-win = window
-win.set_app_paintable(True)
-screen = win.get_screen()
-rgba = screen.get_rgba_visual()
-win.set_visual(rgba)
-wmclass = 'qmlterm_background'
-win.set_wmclass(wmclass, wmclass)
-win.stick()
-win.set_keep_below(True)
-win.fullscreen()
-win.set_accept_focus(False)
+    win = window
+    win.set_app_paintable(True)
+    screen = win.get_screen()
+    rgba = screen.get_rgba_visual()
+    win.set_visual(rgba)
+    wmclass = 'qmlterm_background'
+    win.set_wmclass(wmclass, wmclass)
+    win.stick()
+    win.set_keep_below(True)
+    win.fullscreen()
+    win.set_accept_focus(False)
 
-app = Squareset()
-window.add(app)
-app.connect('draw', app.do_draw_cb)
-window.connect_after('destroy', destroy)
-window.show_all()
+    app = Squareset()
+    window.add(app)
+    app.connect('draw', app.do_draw_cb)
+    window.connect_after('destroy', destroy)
+    window.show_all()
 
-GObject.timeout_add(fps, tick)
+    GObject.timeout_add(fps, tick)
 
+    import signal
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-import setproctitle
-setproctitle.setproctitle("background-visualizer")
-import signal
-signal.signal(signal.SIGINT, signal.SIG_DFL)
-
-Gtk.main()
+    Gtk.main()
