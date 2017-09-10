@@ -3,6 +3,7 @@ gi.require_version('PangoCairo', '1.0')
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, cairo, Pango, PangoCairo, GObject
 import math
+import pyaudio
 import numpy as np
 import sys
 
@@ -25,6 +26,25 @@ SAMPLE_MAX = 32767
 SAMPLE_RATE = 44100  # [Hz]
 SAMPLE_MAX = SAMPLE_RATE
 
+CHANNEL_COUNT = 2
+BUFFER_SIZE = 5000 
+BUFFER_SIZE = m_samples
+
+def record_pyaudio():
+    p = pyaudio.PyAudio()
+
+    stream = p.open(format = pyaudio.paInt16,
+                    channels = CHANNEL_COUNT,
+                    rate = SAMPLE_RATE,
+                    input = True,
+                    frames_per_buffer = BUFFER_SIZE)
+
+    def read_data():
+        data = np.fromstring(stream.read(stream.get_read_available()), 'int16').astype(float)
+        if len(data):
+            return data
+    return read_data
+read_data=record_pyaudio()
 
 class Squareset(Gtk.DrawingArea):
     def __init__(self, upper=9, text=''):
@@ -34,10 +54,11 @@ class Squareset(Gtk.DrawingArea):
 
     def getData(self):
         line = self.fifo.read(m_samples)
-        data = np.frombuffer(line, 'int16').astype(float)
+        #data = np.frombuffer(line, 'int16').astype(float)
+        data = read_data()
+        return data
         queue.append(data)
         return queue.pop(0)
-        #return data
 
     def do_draw_cb(self, widget, cr):
         allo = self.get_allocation()
