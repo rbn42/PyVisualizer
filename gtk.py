@@ -8,7 +8,11 @@ import sys
 
 FIFO = '/tmp/mpd.fifo'
 stereo = True
-fps = 25
+fps = 60
+frames_delay=0
+queue=[]
+for _ in range(frames_delay):
+    queue.append([])
 m_samples = 44100 // fps
 if stereo:
     m_samples *= 2
@@ -31,7 +35,9 @@ class Squareset(Gtk.DrawingArea):
     def getData(self):
         line = self.fifo.read(m_samples)
         data = np.frombuffer(line, 'int16').astype(float)
-        return data
+        queue.append(data)
+        return queue.pop(0)
+        #return data
 
     def do_draw_cb(self, widget, cr):
         allo = self.get_allocation()
