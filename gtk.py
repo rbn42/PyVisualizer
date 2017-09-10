@@ -78,10 +78,10 @@ if sin.start():
     rgba = screen.get_rgba_visual()
     win.set_visual(rgba)
     win.set_wmclass(wmclass, wmclass)
-    win.stick()
-    win.set_keep_below(True)
+    #win.stick()
+    #win.set_keep_below(True)
     win.fullscreen()
-    win.set_accept_focus(False)
+    #win.set_accept_focus(False)
 
     app = Squareset()
     window.add(app)
