@@ -58,6 +58,9 @@ def record_pyaudio():
 
 read_data = record_pyaudio()
 
+kernel=list(range(1,20))+list(range(20,1,-1))
+kernel=np.asarray(kernel)
+kernel=kernel/sum(kernel)
 
 class Squareset(Gtk.DrawingArea):
     def do_draw_cb(self, widget, cr):
@@ -65,7 +68,7 @@ class Squareset(Gtk.DrawingArea):
         w, h = alloc.width, alloc.height
         data = next(read_data)
         fft = np.absolute(np.fft.rfft(data, n=len(data)))
-        bins = np.convolve(fft, [0.02] * 50)
+        bins = np.convolve(fft, kernel)
         cr.set_source_rgba(1, 1, 1, opacity)
 
         cr.move_to(0, h / 2)  # middle left
