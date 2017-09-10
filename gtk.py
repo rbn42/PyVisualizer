@@ -13,6 +13,10 @@ m_samples = 44100 // fps
 if stereo:
     m_samples *= 2
 
+opacity=0.1
+
+wmclass = 'qmlterm_background'
+
 SAMPLE_MAX = 32767
 SAMPLE_RATE = 44100  # [Hz]
 SAMPLE_MAX = SAMPLE_RATE
@@ -35,7 +39,7 @@ class Squareset(Gtk.DrawingArea):
         data = self.getData()
         fft = np.absolute(np.fft.rfft(data, n=len(data)))
         bins = fft
-        cr.set_source_rgba(1, 1, 1, 0.1)
+        cr.set_source_rgba(1, 1, 1, opacity)
 
         cr.move_to(0, h / 2)  # middle left
         width = 2 * w / len(bins)
@@ -73,7 +77,6 @@ if sin.start():
     screen = win.get_screen()
     rgba = screen.get_rgba_visual()
     win.set_visual(rgba)
-    wmclass = 'qmlterm_background'
     win.set_wmclass(wmclass, wmclass)
     win.stick()
     win.set_keep_below(True)
