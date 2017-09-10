@@ -10,15 +10,12 @@ import sys
 FIFO = '/tmp/mpd.fifo'
 stereo = True
 fps = 60
-frames_delay=0
-queue=[]
-for _ in range(frames_delay):
-    queue.append([])
+frames_delay = 0
 m_samples = 44100 // fps
 if stereo:
     m_samples *= 2
 
-opacity=0.1
+opacity = 0.1
 
 wmclass = 'qmlterm_background'
 
@@ -27,45 +24,48 @@ SAMPLE_RATE = 44100  # [Hz]
 SAMPLE_MAX = SAMPLE_RATE
 
 CHANNEL_COUNT = 2
-BUFFER_SIZE = 5000 
+BUFFER_SIZE = 5000
 BUFFER_SIZE = m_samples
+
+
+def record_mpd():
+    fifo = open(FIFO, 'rb')
+    queue = []
+    for _ in range(frames_delay):
+        queue.append([])
+
+    while True:
+        line = fifo.read(m_samples)
+        queue.append(data)
+        yield queue.pop(0)
+
 
 def record_pyaudio():
     p = pyaudio.PyAudio()
 
-    stream = p.open(format = pyaudio.paInt16,
-                    channels = CHANNEL_COUNT,
-                    rate = SAMPLE_RATE,
-                    input = True,
-                    frames_per_buffer = BUFFER_SIZE)
+    stream = p.open(format=pyaudio.paInt16,
+                    channels=CHANNEL_COUNT,
+                    rate=SAMPLE_RATE,
+                    input=True,
+                    frames_per_buffer=BUFFER_SIZE)
 
-    def read_data():
-        data = np.fromstring(stream.read(stream.get_read_available()), 'int16').astype(float)
+    while True:
+        data = np.fromstring(stream.read(
+            stream.get_read_available()), 'int16')
         if len(data):
-            return data
-    return read_data
-read_data=record_pyaudio()
+            yield data
+
+
+read_data = record_pyaudio()
+
 
 class Squareset(Gtk.DrawingArea):
-    def __init__(self, upper=9, text=''):
-        Gtk.DrawingArea.__init__(self)
-        #self.set_size_request(w, h)
-        self.fifo = open(FIFO, 'rb')
-
-    def getData(self):
-        line = self.fifo.read(m_samples)
-        #data = np.frombuffer(line, 'int16').astype(float)
-        data = read_data()
-        return data
-        queue.append(data)
-        return queue.pop(0)
-
     def do_draw_cb(self, widget, cr):
-        allo = self.get_allocation()
-        w, h = allo.width, allo.height
-        data = self.getData()
+        alloc = self.get_allocation()
+        w, h = alloc.width, alloc.height
+        data = next(read_data)
         fft = np.absolute(np.fft.rfft(data, n=len(data)))
-        bins = np.convolve(fft,[0.02]*50)
+        bins = np.convolve(fft, [0.02] * 50)
         cr.set_source_rgba(1, 1, 1, opacity)
 
         cr.move_to(0, h / 2)  # middle left
@@ -105,10 +105,10 @@ if sin.start():
     rgba = screen.get_rgba_visual()
     win.set_visual(rgba)
     win.set_wmclass(wmclass, wmclass)
-    #win.stick()
-    #win.set_keep_below(True)
+    # win.stick()
+    # win.set_keep_below(True)
     win.fullscreen()
-    #win.set_accept_focus(False)
+    # win.set_accept_focus(False)
 
     app = Squareset()
     window.add(app)
