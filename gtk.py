@@ -65,7 +65,7 @@ class Squareset(Gtk.DrawingArea):
         w, h = allo.width, allo.height
         data = self.getData()
         fft = np.absolute(np.fft.rfft(data, n=len(data)))
-        bins = fft
+        bins = np.convolve(fft,[0.02]*50)
         cr.set_source_rgba(1, 1, 1, opacity)
 
         cr.move_to(0, h / 2)  # middle left
